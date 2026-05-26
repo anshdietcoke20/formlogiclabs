@@ -10,6 +10,8 @@ import { serverRouter, createContext } from "@repo/trpc/server";
 
 import { env } from "./env";
 
+import cookieParser from "cookie-parser";
+
 export const app = express();
 const openApiDocument = generateOpenApiDocument(serverRouter, {
   title: "Streamyst OpenAPI",
@@ -20,12 +22,15 @@ const openApiDocument = generateOpenApiDocument(serverRouter, {
 if (env.NODE_ENV !== "prod") {
   app.use(
     cors({
-      origin: "*",
-    }),
-  );
+        origin:process.env.WEB_URL,
+        credentials:true,
+    })
+)
 }
 
 app.use(express.json());
+
+app.use(cookieParser());
 
 app.get("/", (req, res) => {
   return res.json({ message: "Streamyst is up and running..." });

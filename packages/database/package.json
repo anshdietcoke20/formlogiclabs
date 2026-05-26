@@ -4,7 +4,7 @@
   "scripts": {
     "db:migrate": "dotenv -- drizzle-kit migrate",
     "db:generate": "dotenv -- drizzle-kit generate",
-    "dev": "dotenv -- drizzle-kit studio"
+    "dev": "cross-env DATABASE_URL=postgresql://test:test@localhost:5432/test drizzle-kit studio"
   },
   "devDependencies": {
     "@repo/eslint-config": "workspace:*",
