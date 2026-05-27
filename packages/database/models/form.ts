@@ -18,6 +18,8 @@ export const formsTable = pgTable("forms", {
   isPublished:boolean("is_published").default(false),
   isPublic: boolean("is_public").default(true),
 
+  description: text("description"),
+
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").$onUpdate(() => new Date()),
 });

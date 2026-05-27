@@ -15,6 +15,13 @@
       "when": 1779769262677,
       "tag": "0001_hesitant_gabe_jones",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1779822652304,
+      "tag": "0002_noisy_doctor_octopus",
+      "breakpoints": true
     }
   ]
 }

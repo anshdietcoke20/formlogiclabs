@@ -14,7 +14,12 @@ export default function LoginPage(){
             router.push("/dashboard")
         },
         onError: (error:any) => {
-            setError(error.message)
+            if(error.message?.includes("Rate limit exceeded")){
+                setError("Too many login attempts. Try again in some time.")
+            }
+            else{
+                setError(error.message)
+            }
         }
     })
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {

@@ -11,7 +11,9 @@ export default function SingupPage(){
 
     const signupMutation = trpc.auth.signup.useMutation({
         onSuccess : (data:any) => {
-            router.push("/dashboard")
+            if(data.token){
+                localStorage.setItem("auth_token", data.token)
+            } router.push("/dashboard")
         },
         onError: (error:any) => {
             setError(error.message)

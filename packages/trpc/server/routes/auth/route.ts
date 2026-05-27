@@ -1,7 +1,9 @@
 import { z } from "../../schema";
+import * as jwt from "jsonwebtoken";
 import { authService } from "../../services/auth.service";
 import { publicProcedure, router } from "../../trpc";
 import { setTokenCookie } from "../../utils/cookie";
+
 
 const signupSchema = z.object({
     name: z.string().min(3, "Name must be at least 3 characters"),
@@ -18,10 +20,19 @@ const loginSchema = z.object({
 })
 
 export const authRouter = router({
-    signup: publicProcedure.input(signupSchema).mutation(async ({input}) => {
+    signup: publicProcedure.input(signupSchema).mutation(async ({input,ctx}) => {
         const userCreated = await authService.signup(input)
+
+        const token = jwt.sign(
+            {id: userCreated.id, email: userCreated.email}, 
+            process.env.JWT_SECRET_KEY as string, 
+            {expiresIn: "1d"}
+        )
+
+        setTokenCookie(ctx.res, token);
         return{
             success: true, 
+            token,
             userCreated,
             message: "Account created successfully"
         }
@@ -30,6 +41,6 @@ export const authRouter = router({
     login: publicProcedure.input(loginSchema).mutation(async ({input,ctx}) => {
         const result = await authService.login(input)
         setTokenCookie(ctx.res, result.token);
-        return{ success: true, user :{ id: result.id, name: result.name, email: result.email}}
+        return{ success: true, token: result.token, user :{ id: result.id, name: result.name, email: result.email}}
     })
 })

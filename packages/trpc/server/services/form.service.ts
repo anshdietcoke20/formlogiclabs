@@ -1,16 +1,41 @@
-
+import {Resend} from "resend";
 import { asc, db } from "@repo/database";
 import { eq } from "@repo/database";
 import {TRPCError} from "@trpc/server";
-import { formsTable, fieldsTable } from "@repo/database/schema";
+import { formsTable, fieldsTable,usersTable } from "@repo/database/schema";
 import type { FieldType } from "@repo/database/schema";
+
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 export const formService = {
     async createForm(userId: string){
+
+        const user = await db.select().from(usersTable).where(eq(usersTable.id, userId));
+
         const form = await db.insert(formsTable).values({
             title: "Untitle Form", 
+            description: "",
             userId,
         }).returning();
+
+
+    if(user[0]?.email){
+    await resend.emails.send({
+  from: 'onboarding@resend.dev',
+  to: user[0].email,
+  subject: 'Your form has been created!',
+  html:`
+                <h2 style="font-family:sans-serif">Form created successfully!</h2>
+                <p style="font-family:sans-serif;color:#555">
+                    Hi ${user[0].fullName}, your new form <strong>${form[0].title}</strong> has been created.
+                </p>
+                <p style="font-family:sans-serif;color:#555">
+                    You can now add fields, publish it and share it with others.
+                </p>
+               
+        `,
+});
+    }
 
         return form[0]
     },
@@ -38,7 +63,7 @@ export const formService = {
 
     async updateForm(formId:string, userId:string, input:{title:string}){
         const form = await db.update(formsTable)
-        .set({title:input.title})
+        .set(input)
         .where((eq(formsTable.id, formId),
     eq(formsTable.userId, userId))).returning()
 
@@ -135,7 +160,13 @@ export const formService = {
    options?:string[],
    placeholder?:string,
     }){
-         const field = await db.update(fieldsTable).set(input).where(eq(fieldsTable.id, fieldId)).returning();
+         const field = await db.update(fieldsTable).set({
+            ...(input.label !== undefined && { label: input.label }),
+            ...(input.required !== undefined && { required: input.required }),
+            ...(input.options !== undefined && { options: input.options }),
+            ...(input.placeholder !== undefined && { placeholder: input.placeholder }),
+            ...(input.type !== undefined && {type: input.type}),
+        }).where(eq(fieldsTable.id, fieldId)).returning();
 
          if(field.length === 0 ){
         throw new TRPCError({

@@ -54,7 +54,11 @@ import Link from "next/link";
               font-size: 100px;
               margin-bottom: 10px;
               color: white;
-              text-shadow: 0 4px 20px rgba(0,0,0,0.5);
+               text-shadow:
+                        1px 1px 0 #ddd,
+                        2px 2px 0 #ccc,
+                        3px 3px 0 #bbb;
+             
               }
 
               .hero-letter{
@@ -69,6 +73,10 @@ import Link from "next/link";
               color:#ff69b4;
                transform:translateY(-4px) scale(1.08);
                text-shadow:0 0 12px rgba(255,105,180,0.8);
+                text-shadow:
+                        1px 1px 0 #ddd,
+                        2px 2px 0 #ccc,
+                        3px 3px 0 #bbb;
                }
 
               .hero-sub{

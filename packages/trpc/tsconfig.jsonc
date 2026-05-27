@@ -1,3 +1,6 @@
  { "extends": "@repo/typescript-config/node.json",
-  "include": ["server/", "client/"]
+  "include": ["server/", "client/"],
+   "compilerOptions": {
+    "lib": ["es2019"]
+  }
  }

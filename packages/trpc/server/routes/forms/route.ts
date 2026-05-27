@@ -20,7 +20,8 @@ export const formsRouter = router({
 
     updateForm: protectedProcedure.input(z.object({
         formId: z.string().uuid(),
-        title: z.string(),
+        title: z.string().optional(),
+        description: z.string().optional()
     })).mutation(({input, ctx}) => {
         return formService.updateForm(input.formId, ctx.user.id, {title: input.title})
     }),
@@ -53,11 +54,12 @@ export const formsRouter = router({
     }), 
 
     updateField:protectedProcedure.input(z.object({
-        fieldId:z.string().uuid(),
-        label: z.string().optional(),
-        required: z.boolean().optional(),
-        options: z.array(z.string()).optional(),
-        placeholder: z.string().optional(),
+    fieldId: z.string().uuid(),
+    label: z.string().optional(),
+    required: z.boolean().optional(),
+    options: z.array(z.string()).optional(),
+    placeholder: z.string().optional(),
+    type: z.string().optional(),
     })).mutation(({input,ctx}) => {
         const { fieldId, ...rest} = input;
         return formService.updateField(fieldId,ctx.user!.id, rest)
@@ -67,6 +69,16 @@ export const formsRouter = router({
     .mutation(({ input }) => {
         return formService.deleteField(input.fieldId)
     }),
+
+   reorderFields: protectedProcedure
+    .input(z.array(z.object({
+        id: z.string().uuid(),
+        order: z.number(),
+    })))
+    .mutation(({ input }) => {
+        return formService.reorderFields(input)
+    }),
+
 
 })
 

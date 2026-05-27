@@ -10,6 +10,8 @@ import { serverRouter, createContext } from "@repo/trpc/server";
 
 import { env } from "./env";
 
+import { rateLimit } from "./rate-limit";
+
 import cookieParser from "cookie-parser";
 
 export const app = express();
@@ -57,11 +59,58 @@ app.use(
 );
 
 app.use(
+    "/trpc/auth.login",
+    rateLimit({
+        windowSeconds: 15 * 60,  
+        maxRequests: 10,          
+        keyPrefix: "login",
+    })
+);
+
+app.use(
+    "/trpc/submissions.submitForm",
+    rateLimit({
+        windowSeconds: 10 * 60, 
+        maxRequests: 8,          
+        keyPrefix: "submit",
+    })
+);
+
+app.use(
+    "/trpc/forms.createForm",
+    rateLimit({
+        windowSeconds: 24 * 60 * 60,  
+        maxRequests: 20,               
+        keyPrefix: "create_form",
+    })
+);
+
+app.use(
+    "/trpc",
+    rateLimit({
+        windowSeconds: 60,   
+        maxRequests: 100,    
+        keyPrefix: "general",
+    })
+);
+
+app.use(
+    "/trpc",
+    trpcExpress.createExpressMiddleware({
+        router: serverRouter,
+        createContext,
+    })
+);
+
+
+
+app.use(
   "/trpc",
   trpcExpress.createExpressMiddleware({
     router: serverRouter,
     createContext,
   }),
 );
+
 
 export default app;
