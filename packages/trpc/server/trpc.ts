@@ -12,7 +12,7 @@ export const router = tRPCContext.router;
 export const publicProcedure = tRPCContext.procedure;
 
 export const protectedProcedure = tRPCContext.procedure.use(({ctx,next}) => {
-  if(!ctx.user){
+  if(!ctx.user?.id){
     throw new TRPCError({
       code: "UNAUTHORIZED",
       message:"You must be logged in"
@@ -20,6 +20,6 @@ export const protectedProcedure = tRPCContext.procedure.use(({ctx,next}) => {
   }
 
   return next({
-    ctx:{user: ctx.user}
+    ctx:{...ctx, user:ctx.user}
   })
 })

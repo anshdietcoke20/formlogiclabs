@@ -1,10 +1,10 @@
-//hashpassword, check existing user, verify password, create session/token 
 import bcrypt from "bcryptjs";
 import  * as jwt  from "jsonwebtoken";
-import { db } from "@repo/database";
+import  db  from "@repo/database";
 import { eq } from "@repo/database";
 import {TRPCError} from "@trpc/server";
-import { usersTable } from "@repo/database/schema"
+import { usersTable } from "@repo/database/schema";
+
 
 const JWT_SECRET = process.env.JWT_SECRET_KEY
 
@@ -48,7 +48,14 @@ export const authService = {
             })
         }
 
-        const user = loginUser[0]
+        const user = loginUser[0]!
+
+        if (!user.password) {
+            throw new TRPCError({
+                code: "UNAUTHORIZED",
+                message: "This account has no password set"
+            })
+        }
 
         const isPasswordCorrect = await bcrypt.compare(input.password, user.password)
 

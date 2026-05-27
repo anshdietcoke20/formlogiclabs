@@ -13,7 +13,7 @@ export function rateLimit(opts: RateLimitOptions) {
         
         const forwarded = req.headers["x-forwarded-for"];
 
-        const ip =  Array.isArray(forwarded)? forwarded[0] : forwarded ?.split(",")?.trim();
+        const ip =  Array.isArray(forwarded)? forwarded[0] : forwarded ?.trim() ?? '127.0.0.1';
 
         const key = `rate_limit:${opts.keyPrefix}:${ip}`;
 

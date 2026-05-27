@@ -3,6 +3,7 @@ import {
   uuid,
   varchar,
   timestamp,
+  text,
 } from "drizzle-orm/pg-core";
 import {formsTable} from "./form";
 import { usersTable } from "./user";
@@ -12,7 +13,7 @@ export const submissionsTable = pgTable("submissions", {
 
     formId: uuid("form_id").notNull().references(() => formsTable.id, {onDelete:"cascade"}),
 
-    submittedBy: uuid("submitted_by").references(() => usersTable.id, {onDelete: "cascade"}),
+    submittedBy: text("submitted_by").notNull().references(() => usersTable.id, {onDelete: "cascade"}),
 
     submitterEmail: varchar("submitter_email", {length:255}),
 

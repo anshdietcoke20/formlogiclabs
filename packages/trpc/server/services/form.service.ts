@@ -1,5 +1,6 @@
 import {Resend} from "resend";
-import { asc, db } from "@repo/database";
+import { asc } from "@repo/database";
+import db from "@repo/database";
 import { eq } from "@repo/database";
 import {TRPCError} from "@trpc/server";
 import { formsTable, fieldsTable,usersTable } from "@repo/database/schema";
@@ -154,11 +155,20 @@ export const formService = {
    return field[0]
 }, 
 
+async reorderFields(input: { fields: { id: string; order: number }[] }) {
+    await Promise.all(
+        input.fields.map(({ id, order }) =>
+            db.update(fieldsTable).set({ order }).where(eq(fieldsTable.id, id))
+        )
+    )
+},
+
     async updateField(fieldId:string, input:{
    label?:string,
    required?:boolean,
    options?:string[],
    placeholder?:string,
+   type?:string,
     }){
          const field = await db.update(fieldsTable).set({
             ...(input.label !== undefined && { label: input.label }),

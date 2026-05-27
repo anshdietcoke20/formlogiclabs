@@ -2,9 +2,9 @@ import { z } from "../../schema";
 import { formService } from "../../services/form.service";
 import { protectedProcedure, router } from "../../trpc";
 import { fieldsTypeEnum } from "@repo/database/schema";
+import { TRPCError } from "@trpc/server";
 
-
-export const formsRouter = router({
+export const formsRouter = router({ 
     getForms: protectedProcedure.query(({ctx}) => {
         return formService.getForms(ctx.user.id)
     }), 
@@ -23,7 +23,8 @@ export const formsRouter = router({
         title: z.string().optional(),
         description: z.string().optional()
     })).mutation(({input, ctx}) => {
-        return formService.updateForm(input.formId, ctx.user.id, {title: input.title})
+       if (!input.title) throw new TRPCError({ code: 'BAD_REQUEST', message: 'Title is required' })
+return formService.updateForm(input.formId, ctx.user!.id, { title: input.title })
     }),
 
     publishForm : protectedProcedure.input(z.object({formId : z.string().uuid()}))
@@ -62,7 +63,7 @@ export const formsRouter = router({
     type: z.string().optional(),
     })).mutation(({input,ctx}) => {
         const { fieldId, ...rest} = input;
-        return formService.updateField(fieldId,ctx.user!.id, rest)
+        return formService.updateField(fieldId, rest)
 }), 
 
     deleteField: protectedProcedure.input(z.object({ fieldId: z.string().uuid() }))
@@ -76,7 +77,7 @@ export const formsRouter = router({
         order: z.number(),
     })))
     .mutation(({ input }) => {
-        return formService.reorderFields(input)
+        return formService.reorderFields({fields:input.fields})
     }),
 
 
